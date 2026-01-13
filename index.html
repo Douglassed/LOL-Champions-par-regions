@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Champions LoL par Origine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #f0e6d2;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #785a28;
+            background: rgba(255, 255, 255, 0.05);
+            color: #f0e6d2;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: rgba(240, 230, 210, 0.5);
+        }
+
+        .search-input:focus {
+            border-color: #c89b3c;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 15px rgba(200, 155, 60, 0.3);
+        }
+
+        .filter-all-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .filter-all-btn {
+            padding: 12px 40px;
+            border: 3px solid #c89b3c;
+            background: rgba(200, 155, 60, 0.2);
+            color: #f0e6d2;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filter-all-btn:hover {
+            background: rgba(200, 155, 60, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(200, 155, 60, 0.4);
+        }
+
+        .filter-all-btn.active {
+            background: #c89b3c;
+            box-shadow: 0 4px 12px rgba(200, 155, 60, 0.6);
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #785a28;
+            background: rgba(120, 90, 40, 0.3);
+            color: #f0e6d2;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: rgba(120, 90, 40, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #785a28;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #c89b3c;
+            font-size: 1.1em;
+        }
+
+        .origins-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .origin-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(120, 90, 40, 0.3);
+        }
+
+        .origin-title {
+            font-size: 1.8em;
+            color: #c89b3c;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .champions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .champion-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #463714;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .champion-card:hover {
+            transform: translateY(-5px);
+            border-color: #785a28;
+            box-shadow: 0 5px 15px rgba(120, 90, 40, 0.4);
+        }
+
+        .champion-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            border: 2px solid #785a28;
+            object-fit: cover;
+        }
+
+        .champion-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #f0e6d2;
+        }
+
+        .champion-origin {
+            color: #c89b3c;
+            font-size: 0.85em;
+            padding: 4px 8px;
+            background: rgba(200, 155, 60, 0.2);
+            border-radius: 15px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #c89b3c;
+            font-size: 1.3em;
+            margin-top: 50px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ Champions de League of Legends ⚔️</h1>
+        
+        <div class="search-container">
+            <input type="text" 
+                   id="searchInput" 
+                   class="search-input" 
+                   placeholder="🔍 Rechercher un champion..."
+                   oninput="handleSearch()">
+        </div>
+        
+        <div class="filter-all-container">
+            <button class="filter-all-btn active" onclick="filterByOrigin('Tous')">
+                🌍 Tous les Champions
+            </button>
+        </div>
+        
+        <div class="filters" id="filters"></div>
+        
+        <div class="stats" id="stats"></div>
+        
+        <div class="origins-container" id="originsContainer"></div>
+        
+        <div class="no-results hidden" id="noResults">Aucun champion trouvé pour cette origine</div>
+    </div>
+
+    <script>
+        const champions = [
+            // Bandle City
+            { name: "Corki", origin: "Bandle City", id: "Corki" },
+            { name: "Fizz", origin: "Bandle City", id: "Fizz" },
+            { name: "Gnar", origin: "Bandle City", id: "Gnar" },
+            { name: "Heimerdinger", origin: "Bandle City", id: "Heimerdinger" },
+            { name: "Kennen", origin: "Bandle City", id: "Kennen" },
+            { name: "Kled", origin: "Bandle City", id: "Kled" },
+            { name: "Lulu", origin: "Bandle City", id: "Lulu" },
+            { name: "Poppy", origin: "Bandle City", id: "Poppy" },
+            { name: "Rumble", origin: "Bandle City", id: "Rumble" },
+            { name: "Teemo", origin: "Bandle City", id: "Teemo" },
+            { name: "Tristana", origin: "Bandle City", id: "Tristana" },
+            { name: "Veigar", origin: "Bandle City", id: "Veigar" },
+            { name: "Vex", origin: "Bandle City", id: "Vex" },
+            { name: "Yuumi", origin: "Bandle City", id: "Yuumi" },
+            { name: "Ziggs", origin: "Bandle City", id: "Ziggs" },
+
+            // Bilgewater
+            { name: "Fizz", origin: "Bilgewater", id: "Fizz" },
+            { name: "Gangplank", origin: "Bilgewater", id: "Gangplank" },
+            { name: "Graves", origin: "Bilgewater", id: "Graves" },
+            { name: "Illaoi", origin: "Bilgewater", id: "Illaoi" },
+            { name: "Miss Fortune", origin: "Bilgewater", id: "MissFortune" },
+            { name: "Nautilus", origin: "Bilgewater", id: "Nautilus" },
+            { name: "Nilah", origin: "Bilgewater", id: "Nilah" },
+            { name: "Pyke", origin: "Bilgewater", id: "Pyke" },
+            { name: "Tahm Kench", origin: "Bilgewater", id: "TahmKench" },
+            { name: "Twisted Fate", origin: "Bilgewater", id: "TwistedFate" },
+
+            // Demacia
+            { name: "Fiora", origin: "Demacia", id: "Fiora" },
+            { name: "Galio", origin: "Demacia", id: "Galio" },
+            { name: "Garen", origin: "Demacia", id: "Garen" },
+            { name: "Jarvan IV", origin: "Demacia", id: "JarvanIV" },
+            { name: "Kayle", origin: "Demacia", id: "Kayle" },
+            { name: "Lucian", origin: "Demacia", id: "Lucian" },
+            { name: "Lux", origin: "Demacia", id: "Lux" },
+            { name: "Morgana", origin: "Demacia", id: "Morgana" },
+            { name: "Poppy", origin: "Demacia", id: "Poppy" },
+            { name: "Quinn", origin: "Demacia", id: "Quinn" },
+            { name: "Shyvana", origin: "Demacia", id: "Shyvana" },
+            { name: "Sona", origin: "Demacia", id: "Sona" },
+            { name: "Sylas", origin: "Demacia", id: "Sylas" },
+            { name: "Vayne", origin: "Demacia", id: "Vayne" },
+            { name: "Xin Zhao", origin: "Demacia", id: "XinZhao" },
+            
+            // Freljord
+            { name: "Anivia", origin: "Freljord", id: "Anivia" },
+            { name: "Ashe", origin: "Freljord", id: "Ashe" },
+            { name: "Aurora", origin: "Freljord", id: "Aurora" },
+            { name: "Braum", origin: "Freljord", id: "Braum" },
+            { name: "Gnar", origin: "Freljord", id: "Gnar" },
+            { name: "Gragas", origin: "Freljord", id: "Gragas" },
+            { name: "Lissandra", origin: "Freljord", id: "Lissandra" },
+            { name: "Nunu & Willump", origin: "Freljord", id: "Nunu" },
+            { name: "Olaf", origin: "Freljord", id: "Olaf" },
+            { name: "Ornn", origin: "Freljord", id: "Ornn" },
+            { name: "Sejuani", origin: "Freljord", id: "Sejuani" },
+            { name: "Trundle", origin: "Freljord", id: "Trundle" },
+            { name: "Tryndamere", origin: "Freljord", id: "Tryndamere" },
+            { name: "Udyr", origin: "Freljord", id: "Udyr" },
+            { name: "Volibear", origin: "Freljord", id: "Volibear" },
+
+            // Ionia
+            { name: "Ahri", origin: "Ionia", id: "Ahri" },
+            { name: "Akali", origin: "Ionia", id: "Akali" },
+            { name: "Hwei", origin: "Ionia", id: "Hwei" },
+            { name: "Irelia", origin: "Ionia", id: "Irelia" },
+            { name: "Ivern", origin: "Ionia", id: "Ivern" },
+            { name: "Jhin", origin: "Ionia", id: "Jhin" },
+            { name: "Karma", origin: "Ionia", id: "Karma" },
+            { name: "Kayn", origin: "Ionia", id: "Kayn" },
+            { name: "Kennen", origin: "Ionia", id: "Kennen" },
+            { name: "Lee Sin", origin: "Ionia", id: "LeeSin" },
+            { name: "Lillia", origin: "Ionia", id: "Lillia" },
+            { name: "Master Yi", origin: "Ionia", id: "MasterYi" },
+            { name: "Rakan", origin: "Ionia", id: "Rakan" },
+            { name: "Sett", origin: "Ionia", id: "Sett" },
+            { name: "Shen", origin: "Ionia", id: "Shen" },
+            { name: "Syndra", origin: "Ionia", id: "Syndra" },
+            { name: "Varus", origin: "Ionia", id: "Varus" },
+            { name: "Wukong", origin: "Ionia", id: "MonkeyKing" },
+            { name: "Xayah", origin: "Ionia", id: "Xayah" },
+            { name: "Yasuo", origin: "Ionia", id: "Yasuo" },
+            { name: "Yone", origin: "Ionia", id: "Yone" },
+            { name: "Yunara", origin: "Ionia", id: "Yunara" },
+            { name: "Zed", origin: "Ionia", id: "Zed" },
+            
+            // Ixtal
+            { name: "Malphite", origin: "Ixtal", id: "Malphite" },
+            { name: "Milio", origin: "Ixtal", id: "Milio" },
+            { name: "Neeko", origin: "Ixtal", id: "Neeko" },
+            { name: "Nidalee", origin: "Ixtal", id: "Nidalee" },
+            { name: "Qiyana", origin: "Ixtal", id: "Qiyana" },
+            { name: "Rengar", origin: "Ixtal", id: "Rengar" },
+            { name: "Skarner", origin: "Ixtal", id: "Skarner" },
+            { name: "Zyra", origin: "Ixtal", id: "Zyra" },
+            
+            // Noxus
+            { name: "Ambessa", origin: "Noxus", id: "Ambessa" },
+            { name: "Briar", origin: "Noxus", id: "Briar" },
+            { name: "Cassiopeia", origin: "Noxus", id: "Cassiopeia" },
+            { name: "Darius", origin: "Noxus", id: "Darius" },
+            { name: "Draven", origin: "Noxus", id: "Draven" },
+            { name: "Katarina", origin: "Noxus", id: "Katarina" },
+            { name: "Kled", origin: "Noxus", id: "Kled" },
+            { name: "LeBlanc", origin: "Noxus", id: "Leblanc" },
+            { name: "Mel", origin: "Noxus", id: "Mel" },
+            { name: "Mordekaiser", origin: "Noxus", id: "Mordekaiser" },
+            { name: "Rell", origin: "Noxus", id: "Rell" },
+            { name: "Riven", origin: "Noxus", id: "Riven" },
+            { name: "Samira", origin: "Noxus", id: "Samira" },
+            { name: "Sion", origin: "Noxus", id: "Sion" },
+            { name: "Swain", origin: "Noxus", id: "Swain" },
+            { name: "Talon", origin: "Noxus", id: "Talon" },
+            { name: "Vladimir", origin: "Noxus", id: "Vladimir" },
+            
+            // Piltover
+            { name: "Caitlyn", origin: "Piltover", id: "Caitlyn" },
+            { name: "Camille", origin: "Piltover", id: "Camille" },
+            { name: "Corki", origin: "Piltover", id: "Corki" },
+            { name: "Ezreal", origin: "Piltover", id: "Ezreal" },
+            { name: "Heimerdinger", origin: "Piltover", id: "Heimerdinger" },
+            { name: "Jayce", origin: "Piltover", id: "Jayce" },
+            { name: "Orianna", origin: "Piltover", id: "Orianna" },
+            { name: "Seraphine", origin: "Piltover", id: "Seraphine" },
+            { name: "Vi", origin: "Piltover", id: "Vi" },
+
+            // Îles Obscures
+            { name: "Elise", origin: "Îles Obscures", id: "Elise" },
+            { name: "Fiddlesticks", origin: "Îles Obscures", id: "Fiddlesticks" },
+            { name: "Gwen", origin: "Îles Obscures", id: "Gwen" },
+            { name: "Hecarim", origin: "Îles Obscures", id: "Hecarim" },
+            { name: "Kalista", origin: "Îles Obscures", id: "Kalista" },
+            { name: "Karthus", origin: "Îles Obscures", id: "Karthus" },
+            { name: "Maokai", origin: "Îles Obscures", id: "Maokai" },
+            { name: "Senna", origin: "Îles Obscures", id: "Senna" },
+            { name: "Thresh", origin: "Îles Obscures", id: "Thresh" },
+            { name: "Vex", origin: "Îles Obscures", id: "Vex" },
+            { name: "Viego", origin: "Îles Obscures", id: "Viego" },
+            { name: "Yorick", origin: "Îles Obscures", id: "Yorick" },
+            
+            // Shurima
+            { name: "Akshan", origin: "Shurima", id: "Akshan" },
+            { name: "Amumu", origin: "Shurima", id: "Amumu" },
+            { name: "Azir", origin: "Shurima", id: "Azir" },
+            { name: "K'Sante", origin: "Shurima", id: "KSante" },
+            { name: "Naafiri", origin: "Shurima", id: "Naafiri" },
+            { name: "Nasus", origin: "Shurima", id: "Nasus" },
+            { name: "Rammus", origin: "Shurima", id: "Rammus" },
+            { name: "Renekton", origin: "Shurima", id: "Renekton" },
+            { name: "Sivir", origin: "Shurima", id: "Sivir" },
+            { name: "Taliyah", origin: "Shurima", id: "Taliyah" },
+            { name: "Xerath", origin: "Shurima", id: "Xerath" },
+            
+            // Targon
+            { name: "Aphelios", origin: "Targon", id: "Aphelios" },
+            { name: "Aurelion Sol", origin: "Targon", id: "AurelionSol" },
+            { name: "Diana", origin: "Targon", id: "Diana" },
+            { name: "Leona", origin: "Targon", id: "Leona" },
+            { name: "Pantheon", origin: "Targon", id: "Pantheon" },
+            { name: "Soraka", origin: "Targon", id: "Soraka" },
+            { name: "Taric", origin: "Targon", id: "Taric" },
+            { name: "Zoe", origin: "Targon", id: "Zoe" },
+            
+            // Néant
+            { name: "Bel'Veth", origin: "Néant", id: "Belveth" },
+            { name: "Cho'Gath", origin: "Néant", id: "Chogath" },
+            { name: "Kai'Sa", origin: "Néant", id: "Kaisa" },
+            { name: "Khassadin", origin: "Néant", id: "Kassadin" },
+            { name: "Kha'Zix", origin: "Néant", id: "Khazix" },
+            { name: "Kog'Maw", origin: "Néant", id: "KogMaw" },
+            { name: "Malzahar", origin: "Néant", id: "Malzahar" },
+            { name: "Rek'Sai", origin: "Néant", id: "RekSai" },
+            { name: "Vel'Koz", origin: "Néant", id: "Velkoz" },
+            
+            // Zaun
+            { name: "Blitzcrank", origin: "Zaun", id: "Blitzcrank" },
+            { name: "Dr. Mundo", origin: "Zaun", id: "DrMundo" },
+            { name: "Ekko", origin: "Zaun", id: "Ekko" },
+            { name: "Janna", origin: "Zaun", id: "Janna" },
+            { name: "Jinx", origin: "Zaun", id: "Jinx" },
+            { name: "Renata Glasc", origin: "Zaun", id: "Renata" },
+            { name: "Singed", origin: "Zaun", id: "Singed" },
+            { name: "Twitch", origin: "Zaun", id: "Twitch" },
+            { name: "Urgot", origin: "Zaun", id: "Urgot" },
+            { name: "Viktor", origin: "Zaun", id: "Viktor" },
+            { name: "Warwick", origin: "Zaun", id: "Warwick" },
+            { name: "Zac", origin: "Zaun", id: "Zac" },
+            { name: "Zeri", origin: "Zaun", id: "Zeri" },
+            { name: "Ziggs", origin: "Zaun", id: "Ziggs" },
+            
+        ];
+
+        let currentFilter = "Tous";
+        let searchQuery = "";
+
+        const originsOnly = [...new Set(champions.map(c => c.origin))].sort();
+
+        function init() {
+            renderFilters();
+            renderChampions();
+        }
+
+        function renderFilters() {
+            const filtersDiv = document.getElementById("filters");
+            const filterAllBtn = document.querySelector(".filter-all-btn");
+            
+            // Mise à jour du bouton "Tous"
+            if (currentFilter === "Tous") {
+                filterAllBtn.classList.add("active");
+            } else {
+                filterAllBtn.classList.remove("active");
+            }
+            
+            // Affichage des filtres d'origine (sans "Tous")
+            filtersDiv.innerHTML = originsOnly.map(origin => 
+                `<button class="filter-btn ${origin === currentFilter ? 'active' : ''}" 
+                         onclick="filterByOrigin('${origin}')">${origin}</button>`
+            ).join('');
+        }
+
+        function filterByOrigin(origin) {
+            currentFilter = origin;
+            renderFilters();
+            renderChampions();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById("searchInput").value.toLowerCase();
+            renderChampions();
+        }
+
+        function getChampionIcon(championId) {
+            return `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${championId}.png`;
+        }
+
+        function getFilteredChampions() {
+            let filtered = champions;
+            
+            // Filtre par origine
+            if (currentFilter !== "Tous") {
+                filtered = filtered.filter(c => c.origin === currentFilter);
+            }
+            
+            // Filtre par recherche
+            if (searchQuery) {
+                filtered = filtered.filter(c => 
+                    c.name.toLowerCase().includes(searchQuery) ||
+                    c.origin.toLowerCase().includes(searchQuery)
+                );
+            }
+            
+            return filtered;
+        }
+
+        function renderChampions() {
+            const container = document.getElementById("originsContainer");
+            const noResults = document.getElementById("noResults");
+            const stats = document.getElementById("stats");
+            
+            const filtered = getFilteredChampions();
+            
+            if (filtered.length === 0) {
+                container.innerHTML = "";
+                noResults.classList.remove("hidden");
+                stats.textContent = "";
+                return;
+            }
+            
+            noResults.classList.add("hidden");
+            
+            if (currentFilter === "Tous" && !searchQuery) {
+                // Grouper par origine quand aucun filtre n'est actif
+                const grouped = {};
+                filtered.forEach(c => {
+                    if (!grouped[c.origin]) grouped[c.origin] = [];
+                    grouped[c.origin].push(c);
+                });
+                
+                stats.textContent = `${filtered.length} champions au total`;
+                
+                container.innerHTML = Object.keys(grouped).sort().map(origin => `
+                    <div class="origin-section">
+                        <h2 class="origin-title">${origin} (${grouped[origin].length})</h2>
+                        <div class="champions-grid">
+                            ${grouped[origin].map(champion => `
+                                <div class="champion-card">
+                                    <img src="${getChampionIcon(champion.id)}" 
+                                         alt="${champion.name}" 
+                                         class="champion-icon">
+                                    <div class="champion-name">${champion.name}</div>
+                                </div>
+                            `).sort().join('')}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                // Affichage simple quand un filtre est actif
+                const title = searchQuery 
+                    ? `Résultats pour "${searchQuery}"` 
+                    : currentFilter;
+                    
+                stats.textContent = `${filtered.length} champion(s) trouvé(s)`;
+                
+                container.innerHTML = `
+                    <div class="origin-section">
+                        <h2 class="origin-title">${title}</h2>
+                        <div class="champions-grid">
+                            ${filtered.map(champion => `
+                                <div class="champion-card">
+                                    <img src="${getChampionIcon(champion.id)}" 
+                                         alt="${champion.name}" 
+                                         class="champion-icon">
+                                    <div class="champion-name">${champion.name}</div>
+                                    <div class="champion-origin">${champion.origin}</div>
+                                </div>
+                            `).sort().join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
